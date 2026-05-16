@@ -19,7 +19,7 @@ AUTOTESTS/
 - register
 - login
 - verify
-- change-password
+- change-password  
 Для каждого запроса был создан отдельный класс с методами проверок. 
 Для авторизации это файлы в `endpoints/`:
 - register_profile.py
@@ -34,9 +34,9 @@ AUTOTESTS/
 - profiles
 - profiles/me
 - profiles/{account_id}
-- profiles/{account_id}/role
-Были протестированы api методы POST, GET, PUT, DELETE.
-Тут аналогично для каждого запроса был создан отдельный класс с методами проверок.
+- profiles/{account_id}/role  
+Были протестированы api методы POST, GET, PUT, DELETE.  
+Тут аналогично для каждого запроса был создан отдельный класс с методами проверок.  
 Файлы в `endpoints/`:
 - create_profile.py
 - get_list_profiles.py
@@ -46,6 +46,7 @@ AUTOTESTS/
 - update_profile.py
 - delete_profile.py
 - update_account_role.py
+
 Всего вышло 31 тест профилей.
 
 ## Запуск автотестов
