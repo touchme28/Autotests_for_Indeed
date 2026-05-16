@@ -68,3 +68,6 @@ pytest tests/
 pytest -m auth            # только тесты аутентификации
 pytest -m profile         # только тесты профилей
 ```
+
+## Результаты тестов
+![Пройденные тесты](./screenshots/screenshot_tests.png)
