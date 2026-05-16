@@ -191,7 +191,7 @@ class TestProfiles:
         get_profile_object.check_success_message()
 
     #проверка на то, что обычный пользователь НЕ может получить любой профиль
-    def test_user_cannot_get_other_profile(self, user_token, user_info, admin_token):
+    def test_user_cannot_get_other_profile(self, user_token, admin_token):
         #нужно создать второго пользователя для проверки
         new_user_object = RegisterUser()
         alphabet = string.ascii_letters + string.digits
