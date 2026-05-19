@@ -16,9 +16,17 @@ class UpdateMyProfile(Endpoint):
         assert self.response_json['message'] == 'Profile updated successfully'
 
     def check_updated_fields(self, payload):
+        profile = self.response_json['profile']
+
+        for profile_field, payload_value in payload.items():
+            value = profile.get(profile_field)
+            assert value == payload_value
+
+        '''
         assert self.response_json['profile']['name'] == payload['name']
         assert self.response_json['profile']['surname'] == payload['surname']
         assert self.response_json['profile']['middlename'] == payload['middlename']
         assert self.response_json['profile']['birthdate'] == payload['birthdate']
         assert self.response_json['profile']['about'] == payload['about']
         assert self.response_json['profile']['links'] == payload['links']
+        '''
