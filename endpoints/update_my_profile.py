@@ -21,12 +21,3 @@ class UpdateMyProfile(Endpoint):
         for profile_field, payload_value in payload.items():
             value = profile.get(profile_field)
             assert value == payload_value
-
-        '''
-        assert self.response_json['profile']['name'] == payload['name']
-        assert self.response_json['profile']['surname'] == payload['surname']
-        assert self.response_json['profile']['middlename'] == payload['middlename']
-        assert self.response_json['profile']['birthdate'] == payload['birthdate']
-        assert self.response_json['profile']['about'] == payload['about']
-        assert self.response_json['profile']['links'] == payload['links']
-        '''
