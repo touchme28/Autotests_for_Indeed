@@ -54,18 +54,42 @@ class TestAuthentication:
 
         new_user_object.new_user(payload=payload)
         new_user_object.check_response_is_400()
+        new_user_object.check_error_detail_contains('Username or email already exists')
 
-    #проверка на отсутсвие обязательных полей
-    def test_register_missing_fields(self):
+    @pytest.mark.parametrize('payload, missing_fields',[
+        #отсутствие email'а
+        (
+            {'username': 'user_without_email', 'password': '123456'},
+            ['email']
+        ),
+        #отсутствие password'а
+        (
+            {'username': 'user_without_password', 'email': 'user_without_password@example.com'},
+            ['password']
+        ),
+        #отсутствие username'а
+        (
+            {'email': 'user_without_username@example.com', 'password': '123456'},
+            ['username']
+        ),
+        #отсутствие email'а и password'а (двух полей)
+        (
+            {'username': 'user_without_email_and_password'},
+            ['email', 'password']
+        ),
+        #отсутствие всего
+        (
+            {},
+            ['username', 'email', 'password']
+        ),
+    ])
+    #проверка на отсутсвие обязательных полей (параметризованный)
+    def test_register_missing_fields(self,payload, missing_fields):
         new_user_object = RegisterUser()
-
-        payload = {
-            'username' : 'user_without_email',
-            'password' : '123456'
-        }
-
         new_user_object.new_user(payload=payload)
         new_user_object.check_response_is_422()
+        for field in missing_fields:
+            new_user_object.check_validation_error(field)
 
     #проверка входа с валидными данными
     def test_login_valid_data(self, user_info):
@@ -88,6 +112,7 @@ class TestAuthentication:
         }
         default_user.login_user(payload)
         default_user.check_response_is_401()
+        default_user.check_error_detail_contains('Incorrect username or password')
 
     #проверка валидного токена
     def test_verify_valid_token(self, user_token):
@@ -102,6 +127,7 @@ class TestAuthentication:
         verify_default_user = VerifyUser()
         verify_default_user.verify_user('invalid_token')
         verify_default_user.check_response_is_401()
+        verify_default_user.check_error_detail_contains('Could not validate credentials')
 
     #проверка успешной смены пароля
     def test_change_password_success(self, user_info, user_token):
@@ -123,6 +149,7 @@ class TestAuthentication:
         }
         change_password_object.change_password(payload, user_token)
         change_password_object.check_response_is_400()
+        change_password_object.check_error_detail_contains('Invalid old password')
     
     #проверка ошибки, если запрос был сделан с помощью невалидного токена
     def test_change_password_unauthorized(self):
@@ -134,3 +161,4 @@ class TestAuthentication:
         token = 'invalid_token'
         change_password_object.change_password(payload, token)
         change_password_object.check_response_is_401()
+        change_password_object.check_error_detail_contains('Could not validate credentials')

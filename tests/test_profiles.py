@@ -47,6 +47,7 @@ class TestProfiles:
 
         new_profile_object.create_profile(payload=payload, token=user_token)
         new_profile_object.check_response_is_400()
+        new_profile_object.check_error_detail_contains('Profile already exists')
 
     #проверка на то, что пользователь видит в списке только свой профиль
     def test_list_as_user_sees_only_own_profile(self, user_info, user_token):
@@ -82,6 +83,7 @@ class TestProfiles:
         new_list_object = ListProfiles()
         new_list_object.list_profiles(token='invalid_token')
         new_list_object.check_response_is_401()
+        new_list_object.check_error_detail_contains('Could not validate credentials')
 
     #проверка параметров запроса list profiles (limit, offset)
     def test_list_with_limit_offset(self, admin_token):
@@ -134,6 +136,7 @@ class TestProfiles:
         get_my_profile_object = GetMyProfile()
         get_my_profile_object.get_my_profile(token='invalid_token')
         get_my_profile_object.check_response_is_401()
+        get_my_profile_object.check_error_detail_contains('Could not validate credentials')
 
     #проверка успшеного обновления всех полей профиля
     def test_update_my_profile_success(self, user_token):
@@ -169,12 +172,14 @@ class TestProfiles:
         new_update_object = UpdateMyProfile()
         new_update_object.update_my_profile(token='invalid_token', payload={'name': 'test'})
         new_update_object.check_response_is_401()
+        new_update_object.check_error_detail_contains('Could not validate credentials')
 
     #проверка ошибки, в случае обновления еще не созданного профиля
     def test_update_my_profile_not_found(self, user_token):
         new_update_object = UpdateMyProfile()
         new_update_object.update_my_profile(token=user_token, payload={'name': 'test'})
-        new_update_object.check_response_is_404()
+        new_update_object.check_response_is_404() 
+        new_update_object.check_error_detail_contains('Profile not found')
 
     #проверка на получение собственного профиля
     def test_get_own_profile_success(self, user_token, user_info):
@@ -209,6 +214,7 @@ class TestProfiles:
         get_profile_object = GetProfile()
         get_profile_object.get_profile(account_id=new_user_object_id, token=user_token)
         get_profile_object.check_response_is_403()
+        get_profile_object.check_error_detail_contains('Permission denied')
 
         #удаляем второго пользователя, чтобы не засорять БД
         delete_object = DeleteProfile()
@@ -219,12 +225,14 @@ class TestProfiles:
         get_profile_object = GetProfile()
         get_profile_object.get_profile(account_id=999999999, token=admin_token)
         get_profile_object.check_response_is_404()
+        get_profile_object.check_error_detail_contains('Profile not found')
 
     #проверка ошибки, в случае запроса с не валидным токеном
     def test_get_profile_unauthorized(self):
         get_profile_object = GetProfile()
         get_profile_object.get_profile(account_id=1, token='invalid_token')
         get_profile_object.check_response_is_401()
+        get_profile_object.check_error_detail_contains('Could not validate credentials')
 
     #проверка обновления собственного профиля (через запрос api/profiles/{account_id})
     def test_update_own_profile_success(self, user_token, user_info):
@@ -317,6 +325,7 @@ class TestProfiles:
         new_update_object = UpdateProfile()
         new_update_object.update_profile(account_id=new_user_object_id, payload={'name': 'Хакер'}, token=user_token)
         new_update_object.check_response_is_403()
+        new_update_object.check_error_detail_contains('Permission denied')
 
         #удаляем второго пользователя, чтобы не засорять БД
         delete_object = DeleteProfile()
@@ -327,12 +336,14 @@ class TestProfiles:
         new_update_object = UpdateProfile()
         new_update_object.update_profile(account_id=999999, payload={'name': 'Test'}, token=admin_token)
         new_update_object.check_response_is_404()
+        new_update_object.check_error_detail_contains('Profile not found')
 
     #проверка ошибки, в случае запроса с не валидным токеном
     def test_update_unauthorized(self):
         new_update_object = UpdateProfile()
         new_update_object.update_profile(account_id=1, payload={'name': 'Test'}, token='invalid_token')
         new_update_object.check_response_is_401()
+        new_update_object.check_error_detail_contains('Could not validate credentials')
 
     #проверка на успешное удаление профиля админом
     def test_admin_delete_profile_success(self, admin_token):
@@ -361,18 +372,21 @@ class TestProfiles:
         delete_object = DeleteProfile()
         delete_object.delete_profile_by_id(account_id=user_info['id'], admin_token=user_token)
         delete_object.check_response_is_403()
+        delete_object.check_error_detail_contains('Only administrators can delete accounts')
 
     #проверка ошибки, в случае запроса с не валидным токеном
     def test_delete_unauthorized(self):
         delete_object = DeleteProfile()
         delete_object.delete_profile_by_id(account_id=1, admin_token='invalid_token')
         delete_object.check_response_is_401()
+        delete_object.check_error_detail_contains('Could not validate credentials')
 
     #проверка ошибки, при удалении несуществующего профиля
     def test_delete_nonexistent_profile(self, admin_token):
         delete_object = DeleteProfile()
         delete_object.delete_profile_by_id(account_id=999999, admin_token=admin_token)
         delete_object.check_response_is_500()
+        delete_object.check_error_detail_contains('Failed to delete account')
 
     #проверка на успешную смену роли
     def test_admin_change_role_success(self, admin_token):
@@ -406,21 +420,25 @@ class TestProfiles:
         update_role_object = UpdateAccountRole()
         update_role_object.update_role(account_id=user_info['id'], role_name='admin', admin_token=user_token)
         update_role_object.check_response_is_403()
+        update_role_object.check_error_detail_contains('Only administrators can change roles')
 
     #проверка ошибки, в случае запроса с не валидным токеном
     def test_change_role_unauthorized(self):
         update_role_object = UpdateAccountRole()
         update_role_object.update_role(account_id=1, role_name='admin', admin_token='invalid_token')
         update_role_object.check_response_is_401()
+        update_role_object.check_error_detail_contains('Could not validate credentials')
 
     #проверка смены роли несуществующему аккаунту
     def test_change_role_nonexistent_account(self, admin_token):
         update_role_object = UpdateAccountRole()
         update_role_object.update_role(account_id=999999, role_name='admin', admin_token=admin_token)
         update_role_object.check_response_is_500()
+        update_role_object.check_error_detail_contains('Failed to update role')
         
     #проверка несуществующей роли
     def test_change_role_invalid_role_name(self, admin_token, user_info):
         update_role_object = UpdateAccountRole()
         update_role_object.update_role(account_id=user_info['id'], role_name='superadmin', admin_token=admin_token)
         update_role_object.check_response_is_400()
+        update_role_object.check_error_detail_contains('Invalid role name. Must be: user, moderator, or admin')
