@@ -29,7 +29,7 @@ AUTOTESTS/
 - verify_user.py
 - change_password.py
 
-Всего вышло 11 тестов авторизации.
+Всего вышло 15 тестов авторизации.
 
 ### Тесты профилей (файл test_profiles.py)
 Здесь написаны тесты для эндпоинтов в категории Profiles:
@@ -70,4 +70,4 @@ pytest -m profile         # только тесты профилей
 ```
 
 ## Результаты тестов
-![Пройденные тесты](./screenshots/screenshot_tests.png)
+![Пройденные тесты](./screenshots/screenshot_autotests.png)
