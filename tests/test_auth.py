@@ -31,35 +31,6 @@ class TestAuthentication:
             admin_token=admin_token
         )
 
-    '''
-    #проверка регистрации с уже существующим ИМЕНЕМ
-    def test_register_duplicate_username_fails(self, user_info):
-        new_user_object = RegisterUser()
-
-        payload = {
-            'username' : user_info['username'],
-            'email' : 'test@example.com',
-            'password' : '123456'
-        }
-
-        new_user_object.new_user(payload=payload)
-        new_user_object.check_response_is_400()
-
-    #проверка регистрации с уже существующей ПОЧТОЙ
-    def test_register_duplicate_gmail_fails(self, user_info): 
-        new_user_object = RegisterUser()
-
-        payload = {
-            'username' : 'test_user',
-            'email' : user_info['email'],
-            'password' : '123456'
-        }
-
-        new_user_object.new_user(payload=payload)
-        new_user_object.check_response_is_400()
-    '''
-
-
     @pytest.mark.parametrize('duplicate_field, value', [
         ('username', 'test@example.com'),
         ('email', 'test_user')
